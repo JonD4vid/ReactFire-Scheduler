@@ -1,8 +1,4 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-
-// import logo from './logo.svg';
-// import './App.css';
+import React, { Component } from 'react';
 // import FullCalendar from '@fullcalendar/react'
 // import dayGridPlugin from '@fullcalendar/daygrid'
 // import timeGridPlugin from '@fullcalendar/timegrid'
@@ -10,5 +6,12 @@
 // import '@fullcalendar/core/main.css';
 // import '@fullcalendar/daygrid/main.css';
 
-
-// ReactDOM.render(<Dashboard />, document.getElementById('root'));
+export default class Login extends Component {
+    render() {
+    return (
+      <div className="Login">
+  
+      </div> 
+    );
+  }
+}
