@@ -5,9 +5,8 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
 import '@fullcalendar/core/main.css';
 import '@fullcalendar/daygrid/main.css';
-import {Link} from 'react-router-dom';
 
-export default class  Main extends Component {
+export default class Main extends Component {
     render() {
     return (
       <div className="App">
