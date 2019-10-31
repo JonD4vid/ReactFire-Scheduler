@@ -4,16 +4,34 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
 import '@fullcalendar/core/main.css';
-import '@fullcalendar/daygrid/main.css';
+// import '@fullcalendar/daygrid/main.css';
 import {Jumbotron, Carousel, Card, Container, Row, Col, Image, Button} from 'react-bootstrap';
 import { MDBContainer, MDBRow, MDBCol, MDBInput, MDBBtn, MDBCard, MDBCardBody } from 'mdbreact';
-import { MDBContainer, MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter } from 'mdbreact';
+import { MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter } from 'mdbreact';
+import firebase from 'firebase';
+
 
 export default class Main extends Component {
   
   constructor(props) {
     super(props);
 
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in.
+        var displayName = user.displayName;
+        var email = user.email;
+        var emailVerified = user.emailVerified;
+        var photoURL = user.photoURL;
+        var isAnonymous = user.isAnonymous;
+        var uid = user.uid;
+        var providerData = user.providerData;
+        // ...
+      } else {
+        // User is signed out.
+        // ...
+      }
+    });
     this.state = { 
         events: [
           { title: 'event 1', date: '2019-10-28' },
@@ -32,16 +50,36 @@ toggle = () => {
 }
 
 
+
+handleDateClick = (info) => { // bind with an arrow function
+  console.log(info.dateStr);
+  console.log('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+    console.log('Current view: ' + info.view.type);
+}
+
+
     render() {
     return (
-      <div className="App">
-        <MDBRow>
+<div>
+<MDBRow style={{marginTop: '1%'}}> 
+<MDBCol size="10">
+</MDBCol>
 
-        <MDBCol md="6">
+<MDBCol size="2">
+  <h3>Welcome: </h3>
+  </MDBCol>
+  </MDBRow>
+<MDBRow>
 
+        <MDBCol size="8">
+        <MDBCard  style={{ backgroundColor: '#fafafa', height: '600px', width:'750px', marginLeft: '5%',marginTop: '2%',
+        boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
+        padding: '5px 20px',
+       }}>
   <FullCalendar
-  // customButtons=
-  header={{
+    // dateClick={() => this.handleDateClick()}
+    selectable={true}
+    header={{
     left: 'prev,next today',
     center: 'title',
     right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
@@ -51,12 +89,14 @@ toggle = () => {
     weekends={false}
     events={this.state.events}
     />
+    </MDBCard>
 </MDBCol>
-        <MDBCol md="6">
-          <MDBCard>
+        <MDBCol size="4">
+          <MDBCard style={{ marginRight: '5%',  height: '600px', width: '400px', marginTop: '5%', boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
+        padding: '5px 20px',}}>
             <MDBCardBody>
               <form>
-                <p className="h4 text-center py-4">Sign up</p>
+                <p className="h4 text-center py-4">Schedule Appointment</p>
                 <div className="grey-text">
                   <MDBInput
                     label="Your name"
@@ -68,17 +108,8 @@ toggle = () => {
                     success="right"
                   />
                   <MDBInput
-                    label="Your email"
-                    icon="envelope"
-                    group
-                    type="email"
-                    validate
-                    error="wrong"
-                    success="right"
-                  />
-                  <MDBInput
-                    label="Confirm your email"
-                    icon="exclamation-triangle"
+                    label="Your School ID#"
+                    icon="edit"
                     group
                     type="text"
                     validate
@@ -86,12 +117,15 @@ toggle = () => {
                     success="right"
                   />
                   <MDBInput
-                    label="Your password"
-                    icon="lock"
+                    label="State Query Summary"
+                    icon="exclamation-triangle"
                     group
-                    type="password"
+                    type="text"
                     validate
+                    error="wrong"
+                    success="right"
                   />
+      
                 </div>
                 <div className="text-center py-4 mt-3">
                   <MDBBtn color="cyan" type="submit">
@@ -102,8 +136,8 @@ toggle = () => {
             </MDBCardBody>
           </MDBCard>
         </MDBCol>
-      </MDBRow>
-      </div> 
+        </MDBRow>
+      </div>
     );
   }
 }

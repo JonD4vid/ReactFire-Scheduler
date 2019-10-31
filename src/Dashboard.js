@@ -11,14 +11,10 @@ class Dashboard extends Component {
 
   render() {
     return (
-      <div>
           <Router>
-            <Container>
               <Route exact path="/" component={Main} />
               <Route exact path="/auth" component={Login} />
-            </Container>
           </Router>
-          </div>
     );
   }
 }
