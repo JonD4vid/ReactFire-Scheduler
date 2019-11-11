@@ -15,23 +15,30 @@ export default class Main extends Component {
   
   constructor(props) {
     super(props);
+    this.state = {
+      name: '',
+      id: '',
+      query: '',
+    }
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
 
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        // User is signed in.
-        var displayName = user.displayName;
-        var email = user.email;
-        var emailVerified = user.emailVerified;
-        var photoURL = user.photoURL;
-        var isAnonymous = user.isAnonymous;
-        var uid = user.uid;
-        var providerData = user.providerData;
-        // ...
-      } else {
-        // User is signed out.
-        // ...
-      }
-    });
+    // firebase.auth().onAuthStateChanged(function(user) {
+    //   if (user) {
+    //     // User is signed in.
+    //     var displayName = user.displayName;
+    //     var email = user.email;
+    //     var emailVerified = user.emailVerified;
+    //     var photoURL = user.photoURL;
+    //     var isAnonymous = user.isAnonymous;
+    //     var uid = user.uid;
+    //     var providerData = user.providerData;
+    //     // ...
+    //   } else {
+    //     // User is signed out.
+    //     // ...
+    //   }
+    // });
     this.state = { 
         events: [
           { title: 'event 1', date: '2019-10-28' },
@@ -42,7 +49,15 @@ export default class Main extends Component {
     }
   }
 
-  
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
+  handleSubmit(event) {
+    alert('A name was submitted: ' + this.state.name + "requests the following: "+ this.state.query);
+    event.preventDefault();
+  }
+
 toggle = () => {
   this.setState({
     modal: !this.state.modal
@@ -106,6 +121,9 @@ handleDateClick = (info) => { // bind with an arrow function
                     validate
                     error="wrong"
                     success="right"
+                    value={this.state.name}
+                    onChange={this.handleChange}
+
                   />
                   <MDBInput
                     label="Your School ID#"
@@ -115,6 +133,9 @@ handleDateClick = (info) => { // bind with an arrow function
                     validate
                     error="wrong"
                     success="right"
+                    value={this.state.id}
+                    onChange={this.handleChange}
+
                   />
                   <MDBInput
                     label="State Query Summary"
@@ -124,6 +145,9 @@ handleDateClick = (info) => { // bind with an arrow function
                     validate
                     error="wrong"
                     success="right"
+                    value={this.state.query}
+                    onChange={this.handleChange}
+
                   />
       
                 </div>
