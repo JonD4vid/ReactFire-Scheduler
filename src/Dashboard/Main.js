@@ -8,19 +8,42 @@ import '@fullcalendar/core/main.css';
 import {Jumbotron, Carousel, Card, Container, Row, Col, Image, Button} from 'react-bootstrap';
 import { MDBContainer, MDBRow, MDBCol, MDBInput, MDBBtn, MDBCard, MDBCardBody } from 'mdbreact';
 import { MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter } from 'mdbreact';
-import firebase from 'firebase';
+import * as firebase from 'firebase';
 
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBGq-3MeR6v02D6y6rxE4drXzJl7uzNrjs",
+  authDomain: "usc-scheduler.firebaseapp.com",
+  databaseURL: "https://usc-scheduler.firebaseio.com",
+  projectId: "usc-scheduler",
+  storageBucket: "usc-scheduler.appspot.com",
+  messagingSenderId: "273478421299",
+  appId: "1:273478421299:web:a44d26987c27f5930b4c46",
+  measurementId: "G-YETGSPR9DH"
+};
 
 export default class Main extends Component {
   
   constructor(props) {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();   
+
     super(props);
     this.state = {
+      events: [],
       name: '',
       id: '',
       query: '',
+      month: '',
+      day: '',
+      year: ''
     }
-    this.handleChange = this.handleChange.bind(this);
+    // this.handleChange = this.handleChange.bind(this);
+    this.handleChangeYear = this.handleChangeYear.bind(this);
+    this.handleChangeMonth = this.handleChangeMonth.bind(this);
+    this.handleChangeDay = this.handleChangeDay.bind(this);
+    this.handleChangeQuery = this.handleChangeQuery.bind(this);
+
     this.handleSubmit = this.handleSubmit.bind(this);
 
     // firebase.auth().onAuthStateChanged(function(user) {
@@ -39,23 +62,83 @@ export default class Main extends Component {
     //     // ...
     //   }
     // });
-    this.state = { 
-        events: [
-          { title: 'event 1', date: '2019-10-28' },
-          { title: 'event 2', date: '2019-10-29' }
-        ],
-        modal: false
-
-    }
   }
 
-  handleChange(event) {
-    this.setState({value: event.target.value});
+  handleChangeQuery(event) {
+    this.setState({
+      query: event.target.value,
+    
+    });
+  }
+
+  handleChangeYear(event) {
+    this.setState({
+      year: event.target.value,
+    
+    });
+  }
+  handleChangeMonth(event) {
+    this.setState({
+      month: event.target.value,
+
+    });
+  }
+
+  handleChangeDay(event) {
+    this.setState({
+  
+      day: event.target.value,
+
+    });
+  }
+
+  componentDidMount(){
+    var array = [];
+    firebase.firestore().collection("schedule")
+    .get()
+    .then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+            array.push(doc.data())
+        });
+
+    })
+    .catch(function(error) {
+        console.log("Error getting documents: ", error);
+    });
+
+    this.setState({
+      events: array
+    })
+    console.log(array)
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.name + "requests the following: "+ this.state.query);
     event.preventDefault();
+    const date = this.state.year + '-' + this.state.month + '-' + this.state.day
+    const data = { 
+      title: this.state.query,
+      date: date.toString()
+    }
+    this.state.events.push(data)
+
+    // console.log(date)
+    // console.log(this.state.events)
+    // // console.log(this.state.name)
+
+    firebase.firestore().collection("schedule").add(data)
+  .then(function(docRef) {
+      console.log("Document written with ID: ", docRef.id);
+  })
+  .catch(function(error) {
+      console.error("Error adding document: ", error);
+  });
+
+
+
+
+
+
+
   }
 
 toggle = () => {
@@ -67,13 +150,13 @@ toggle = () => {
 
 
 handleDateClick = (info) => { // bind with an arrow function
-  console.log(info.dateStr);
-  console.log('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-    console.log('Current view: ' + info.view.type);
+  alert('Clicked on: ' + info.dateStr);
 }
 
 
     render() {
+      console.log(this.state.events)
+
     return (
 <div>
 <MDBRow style={{marginTop: '1%'}}> 
@@ -91,6 +174,9 @@ handleDateClick = (info) => { // bind with an arrow function
         boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
         padding: '5px 20px',
        }}>
+
+https://fullcalendar.io/docs/Calendar-addEvent-demo
+
   <FullCalendar
     // dateClick={() => this.handleDateClick()}
     selectable={true}
@@ -110,7 +196,7 @@ handleDateClick = (info) => { // bind with an arrow function
           <MDBCard style={{ marginRight: '5%',  height: '600px', width: '400px', marginTop: '5%', boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
         padding: '5px 20px',}}>
             <MDBCardBody>
-              <form>
+              <form onSubmit={this.handleSubmit}>
                 <p className="h4 text-center py-4">Schedule Appointment</p>
                 <div className="grey-text">
                   <MDBInput
@@ -146,9 +232,60 @@ handleDateClick = (info) => { // bind with an arrow function
                     error="wrong"
                     success="right"
                     value={this.state.query}
-                    onChange={this.handleChange}
+                    onChange={this.handleChangeQuery}
 
                   />
+        <MDBRow>
+        <MDBCol size="3">
+
+<MDBInput
+                    group
+                    type="text"
+                    validate
+                    error="wrong"
+                    success="right"
+                    value={this.state.year}
+                    onChange={this.handleChangeYear}
+
+                  />
+                  </MDBCol>
+                  <MDBCol size="1">
+                    <h3>-</h3>
+                  </MDBCol>
+                  <MDBCol size="3">
+
+<MDBInput
+                    group
+                    type="text"
+                    validate
+                    error="wrong"
+                    success="right"
+                    value={this.state.month}
+                    onChange={this.handleChangeMonth}
+
+                  />
+                  </MDBCol>
+                  <MDBCol size="1">
+                    <h3>-</h3>
+                  </MDBCol>
+                  <MDBCol size="3">
+
+<MDBInput
+                    group
+                    type="text"
+                    validate
+                    error="wrong"
+                    success="right"
+                    value={this.state.day}
+                    onChange={this.handleChangeDay}
+
+                  />
+                  </MDBCol>
+                  
+                  </MDBRow>
+
+
+
       
                 </div>
                 <div className="text-center py-4 mt-3">
