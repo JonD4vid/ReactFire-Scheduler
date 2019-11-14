@@ -23,7 +23,8 @@ const firebaseConfig = {
 };
 
 export default class Main extends Component {
-  
+  calendarComponentRef = React.createRef();
+
   constructor(props) {
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();   
@@ -34,14 +35,12 @@ export default class Main extends Component {
       name: '',
       id: '',
       query: '',
-      month: '',
-      day: '',
-      year: ''
+      date: '',
+
     }
     // this.handleChange = this.handleChange.bind(this);
-    this.handleChangeYear = this.handleChangeYear.bind(this);
-    this.handleChangeMonth = this.handleChangeMonth.bind(this);
-    this.handleChangeDay = this.handleChangeDay.bind(this);
+    this.handleChangeDate = this.handleChangeDate.bind(this);
+
     this.handleChangeQuery = this.handleChangeQuery.bind(this);
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -73,24 +72,11 @@ export default class Main extends Component {
 
   handleChangeYear(event) {
     this.setState({
-      year: event.target.value,
+      date: event.target.value,
     
     });
   }
-  handleChangeMonth(event) {
-    this.setState({
-      month: event.target.value,
 
-    });
-  }
-
-  handleChangeDay(event) {
-    this.setState({
-  
-      day: event.target.value,
-
-    });
-  }
 
   componentDidMount(){
     var array = [];
@@ -114,10 +100,10 @@ export default class Main extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const date = this.state.year + '-' + this.state.month + '-' + this.state.day
+    const date = this.state.date
     const data = { 
       title: this.state.query,
-      date: date.toString()
+      date: date
     }
     this.state.events.push(data)
 
@@ -125,13 +111,13 @@ export default class Main extends Component {
     // console.log(this.state.events)
     // // console.log(this.state.name)
 
-    firebase.firestore().collection("schedule").add(data)
-  .then(function(docRef) {
-      console.log("Document written with ID: ", docRef.id);
-  })
-  .catch(function(error) {
-      console.error("Error adding document: ", error);
-  });
+  //   firebase.firestore().collection("schedule").add(data)
+  // .then(function(docRef) {
+  //     console.log("Document written with ID: ", docRef.id);
+  // })
+  // .catch(function(error) {
+  //     console.error("Error adding document: ", error);
+  // });
 
 
 
@@ -149,10 +135,10 @@ toggle = () => {
 
 
 
-handleDateClick = (info) => { // bind with an arrow function
-  alert('Clicked on: ' + info.dateStr);
-}
+handleDateClick = (arg) => {
 
+
+};
 
     render() {
       console.log(this.state.events)
@@ -176,20 +162,41 @@ handleDateClick = (info) => { // bind with an arrow function
        }}>
 
 https://fullcalendar.io/docs/Calendar-addEvent-demo
-
+<div>
   <FullCalendar
-    // dateClick={() => this.handleDateClick()}
-    selectable={true}
+     customButtons={{
+      addEventButton: {
+          text: 'custom!',
+          click: function() {
+            var dateStr = prompt('Enter a date in YYYY-MM-DD format');
+            var date = new Date(dateStr + 'T00:00:00'); // will be in local time
+
+            if (!isNaN(date.valueOf())) { // valid?
+              this.calendarComponentRef.addEvent({
+                title: 'dynamic event',
+                start: date,
+                allDay: true
+              });
+              alert('Great. Now, update your database...');
+            } else {
+              alert('Invalid date.');
+            }
+          }
+          },
+      }
+  }
     header={{
     left: 'prev,next today',
-    center: 'title',
+    center: 'addEventButton',
     right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
   }}
-  defaultView="dayGridMonth"
+  ref={this.calendarComponentRef}
    plugins={[ dayGridPlugin, interactionPlugin, timeGridPlugin ]}
     weekends={false}
     events={this.state.events}
+    dateClick={this.handleDateClick}
     />
+    </div>
     </MDBCard>
 </MDBCol>
         <MDBCol size="4">
