@@ -20,7 +20,7 @@ const firebaseConfig = {
   measurementId: "G-YETGSPR9DH"
 };
 
-export default class Main extends Component {
+export default class Admin extends Component {
   calendarComponentRef = React.createRef();
 
   constructor(props) {
