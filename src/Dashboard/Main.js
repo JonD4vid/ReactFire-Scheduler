@@ -170,27 +170,6 @@ handleDateClick = arg => {
 https://fullcalendar.io/docs/Calendar-addEvent-demo
 <div>
   <FullCalendar
-     customButtons={{
-      addEventButton: {
-          text: 'custom!',
-          click: function() {
-            var dateStr = prompt('Enter a date in YYYY-MM-DD format');
-            var date = new Date(dateStr + 'T00:00:00'); // will be in local time
-
-            if (!isNaN(date.valueOf())) { // valid?
-              this.calendarComponentRef.addEvent({
-                title: 'dynamic event',
-                start: date,
-                allDay: true
-              });
-              alert('Great. Now, update your database...');
-            } else {
-              alert('Invalid date.');
-            }
-          }
-          },
-      }
-  }
     header={{
     left: 'prev,next today',
     center: 'addEventButton',
