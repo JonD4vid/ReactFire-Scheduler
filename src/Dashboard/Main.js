@@ -33,15 +33,21 @@ export default class Main extends Component {
       name: '',
       id: '',
       query: '',
+      year: '',
+      month:'',
+      day:'',
       date: '',
+      isFetching: true,
 
     }
-    // this.handleChange = this.handleChange.bind(this);
-    // this.handleChangeDate = this.handleChangeDate.bind(this);
-
+    this.handleChangeName = this.handleChangeName.bind(this);
+    this.handleChangeId = this.handleChangeId.bind(this);
     this.handleChangeQuery = this.handleChangeQuery.bind(this);
+    this.handleChangeYear = this.handleChangeYear.bind(this);
+    this.handleChangeMonth = this.handleChangeMonth.bind(this);
+    this.handleChangeDay = this.handleChangeDay.bind(this);
 
-    this.handleSubmit = this.handleSubmit.bind(this);
+    // this.handleSubmit = this.handleSubmit.bind(this);
 
     // firebase.auth().onAuthStateChanged(function(user) {
     //   if (user) {
@@ -60,6 +66,22 @@ export default class Main extends Component {
     //   }
     // });
   }
+  
+
+
+  handleChangeName(event) {
+    this.setState({
+      name: event.target.value,
+    
+    });
+  }
+
+  handleChangeId(event) {
+    this.setState({
+      id: event.target.value,
+    
+    });
+  }
 
   handleChangeQuery(event) {
     this.setState({
@@ -70,7 +92,21 @@ export default class Main extends Component {
 
   handleChangeYear(event) {
     this.setState({
-      date: event.target.value,
+      year: event.target.value,
+    
+    });
+  }
+
+  handleChangeMonth(event) {
+    this.setState({
+      month: event.target.value,
+    
+    });
+  }
+
+  handleChangeDay(event) {
+    this.setState({
+      day: event.target.value,
     
     });
   }
@@ -90,32 +126,60 @@ export default class Main extends Component {
         console.log("Error getting documents: ", error);
     });
 
+    setTimeout(() => {
+      this.setState({
+        events:  this.state.events.concat(array)
+      })
+
+      console.log(this.state.events)
+
+      this.setState({
+        isFetching: false,
+      })
+  
+    }, 2000);
+ 
+
+  }
+
+  handleSubmit() {
+    const { name, id, query, day, month, year} = this.state;
+    const date = year + '-' + month + '-' + day;
+
+
+
     this.setState({
-      events: array
-    })
-    console.log(array)
-  }
+      // add new event data
+      events: this.state.events.concat({
+        // creates a new array
+        title: name,
+        query: query,
+        id: id,
+        start: date,
+        // allDay: arg.allDay
+      })
+    });
+    
 
-  handleSubmit(event) {
-    event.preventDefault();
-    const date = this.state.date
-    const data = { 
-      title: this.state.query,
-      date: date
+    const data = {
+      title: name,
+      query: query,
+      id: id,
+      start: date,
     }
-    this.state.events.push(data)
+  
 
-    // console.log(date)
-    // console.log(this.state.events)
-    // // console.log(this.state.name)
+    console.log(date)
+    console.log(this.state.events)
+    // console.log(this.state.name)
 
-  //   firebase.firestore().collection("schedule").add(data)
-  // .then(function(docRef) {
-  //     console.log("Document written with ID: ", docRef.id);
-  // })
-  // .catch(function(error) {
-  //     console.error("Error adding document: ", error);
-  // });
+    firebase.firestore().collection("schedule").add(data)
+  .then(function(docRef) {
+      console.log("Document written with ID: ", docRef.id);
+  })
+  .catch(function(error) {
+      console.error("Error adding document: ", error);
+  });
 
 
 
@@ -124,67 +188,108 @@ export default class Main extends Component {
 
 
   }
-
-toggle = () => {
-  this.setState({
-    modal: !this.state.modal
-  });
-}
 
 
 
 handleDateClick = arg => {
   if (window.confirm("Would you like to add an event to " + arg.dateStr + " ?")) {
+    var nameStr = prompt('Enter Your Full Name');
+    var idStr = prompt('Enter Your Student ID#');
+    var queryStr = prompt('Enter Reason for Appointment');
+    // var date = new Date(dateStr + 'T00:00:00'); // will be in local time
+
     this.setState({
       // add new event data
       events: this.state.events.concat({
         // creates a new array
-        title: "New Event",
-        start: arg.date,
+        title: nameStr,
+        query: queryStr,
+        id: idStr,
+        start: arg.dateStr,
         allDay: arg.allDay
       })
     });
+
+
+    const data = {
+      title: nameStr,
+      query: queryStr,
+      id: idStr,
+      start: arg.dateStr,
+      allDay: arg.allDay
+    }
+     firebase.firestore().collection("schedule").add(data)
+   .then(function(docRef) {
+       console.log("Document written with ID: ", docRef.id);
+   })
+   .catch(function(error) {
+       console.error("Error adding document: ", error);
+   });
+
+
   }
 };
 
     render() {
 
-    return (
+      if(this.state.isFetching){
+        return (
+          
 <div>
-<MDBRow style={{marginTop: '1%'}}> 
-<MDBCol size="10">
-</MDBCol>
+  <h2>Loading...</h2>
+</div>
+        )
+      }
 
-<MDBCol size="2">
-  <h3>Welcome: </h3>
-  </MDBCol>
-  </MDBRow>
-<MDBRow>
 
-        <MDBCol size="8">
-        <MDBCard  style={{ backgroundColor: '#fafafa', height: '600px', width:'750px', marginLeft: '5%',marginTop: '2%',
-        boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
-        padding: '5px 20px',
-       }}>
+      if(this.state.isFetching == false ){
+        return (
+          <div>
+          <MDBRow style={{marginTop: '1%'}}> 
+          <MDBCol size="10">
+          </MDBCol>
+          
+          <MDBCol size="2">
+            <h3>Welcome: </h3>
+            </MDBCol>
+            </MDBRow>
+          <MDBRow>
+          
 
-https://fullcalendar.io/docs/Calendar-addEvent-demo
-<div>
-  <FullCalendar
-    header={{
-    left: 'prev,next today',
-    center: 'addEventButton',
-    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-  }}
-  ref={this.calendarComponentRef}
-   plugins={[ dayGridPlugin, interactionPlugin, timeGridPlugin ]}
-    weekends={false}
-    events={this.state.events}
-    dateClick={this.handleDateClick}
-    />
-    </div>
-    </MDBCard>
-</MDBCol>
-        <MDBCol size="4">
+                  <MDBCol size="8">
+                  <MDBCard  style={{ backgroundColor: '#fafafa', height: '600px', width:'750px', marginLeft: '5%',marginTop: '2%',
+                  boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.2)',
+                  padding: '5px 20px',
+                 }}>
+          
+          {/* https://fullcalendar.io/docs/Calendar-addEvent-demo */}
+
+          <div>
+            <FullCalendar
+              header={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            }}
+            eventLimit={true}
+            views={{
+              timeGridPlugin:{
+                eventLimit: 1
+              }
+            }}
+            titleFormat={{ year: 'numeric', month: 'short', day: 'numeric' } }
+            ref={this.calendarComponentRef}
+             plugins={[ dayGridPlugin, interactionPlugin, timeGridPlugin ]}
+              weekends={false}
+              events={this.state.events}
+              dateClick={this.handleDateClick}
+              />
+              </div>
+              
+              </MDBCard>
+          </MDBCol>
+          
+          <MDBCol size="4">
           <MDBCard style={{ marginRight: '5%',  height: '600px', width: '400px', marginTop: '5%', boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
         padding: '5px 20px',}}>
             <MDBCardBody>
@@ -200,7 +305,7 @@ https://fullcalendar.io/docs/Calendar-addEvent-demo
                     error="wrong"
                     success="right"
                     value={this.state.name}
-                    onChange={this.handleChange}
+                    onChange={this.handleChangeName}
 
                   />
                   <MDBInput
@@ -212,7 +317,7 @@ https://fullcalendar.io/docs/Calendar-addEvent-demo
                     error="wrong"
                     success="right"
                     value={this.state.id}
-                    onChange={this.handleChange}
+                    onChange={this.handleChangeId}
 
                   />
                   <MDBInput
@@ -289,8 +394,11 @@ https://fullcalendar.io/docs/Calendar-addEvent-demo
             </MDBCardBody>
           </MDBCard>
         </MDBCol>
-        </MDBRow>
-      </div>
-    );
+                  
+                  </MDBRow>
+                </div>
+              );
+      }
+
   }
 }

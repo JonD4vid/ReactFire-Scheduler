@@ -34,7 +34,13 @@ export default class Login extends Component {
   }
 
   handleSubmit(){
-    console.log('test')
+    const {username, password} = this.state;
+    firebase.auth().signInWithEmailAndPassword(username, password).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ...
+    });
   }
 
     render() {
