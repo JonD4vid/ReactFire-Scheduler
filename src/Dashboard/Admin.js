@@ -34,6 +34,8 @@ export default class Admin extends Component {
       id: '',
       query: '',
       date: '',
+      isFetching: true,
+
 
     }
     // this.handleChange = this.handleChange.bind(this);
@@ -94,6 +96,20 @@ export default class Admin extends Component {
       events: array
     })
     console.log(array)
+
+    setTimeout(() => {
+      this.setState({
+        events:  this.state.events.concat(array)
+      })
+
+      console.log(this.state.events)
+
+      this.setState({
+        isFetching: false,
+      })
+  
+    }, 2000);
+    
   }
 
   handleSubmit(event) {
@@ -149,6 +165,18 @@ handleDateClick = arg => {
 
     render() {
 
+      if(this.state.isFetching){
+        return (
+          
+<div>
+  <h2>Loading...</h2>
+</div>
+        )
+      }
+
+      if(this.state.isFetching == false ){
+
+
     return (
 <div>
 <MDBRow style={{marginTop: '1%'}}> 
@@ -156,162 +184,46 @@ handleDateClick = arg => {
 </MDBCol>
 
 <MDBCol size="2">
-  <h3>Welcome: </h3>
+<MDBRow>
+
+  <h3 style= {{marginRight: 15}}>Welcome: Admin</h3>
+  <button type="button" class="btn btn-danger">Sign Out</button>
+
+  </MDBRow>
+
   </MDBCol>
   </MDBRow>
 <MDBRow>
-
+<MDBCol size="2">
+  </MDBCol>
         <MDBCol size="8">
         <MDBCard  style={{ backgroundColor: '#fafafa', height: '600px', width:'750px', marginLeft: '5%',marginTop: '2%',
         boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
         padding: '5px 20px',
        }}>
 
-https://fullcalendar.io/docs/Calendar-addEvent-demo
 <div>
   <FullCalendar
-     customButtons={{
-      addEventButton: {
-          text: 'custom!',
-          click: function() {
-            var dateStr = prompt('Enter a date in YYYY-MM-DD format');
-            var date = new Date(dateStr + 'T00:00:00'); // will be in local time
 
-            if (!isNaN(date.valueOf())) { // valid?
-              this.calendarComponentRef.addEvent({
-                title: 'dynamic event',
-                start: date,
-                allDay: true
-              });
-              alert('Great. Now, update your database...');
-            } else {
-              alert('Invalid date.');
-            }
-          }
-          },
-      }
-  }
     header={{
     left: 'prev,next today',
-    center: 'addEventButton',
+    center: 'title',
     right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
   }}
   ref={this.calendarComponentRef}
    plugins={[ dayGridPlugin, interactionPlugin, timeGridPlugin ]}
     weekends={false}
     events={this.state.events}
-    dateClick={this.handleDateClick}
+    // dateClick={this.handleDateClick}
     />
     </div>
     </MDBCard>
 </MDBCol>
-        <MDBCol size="4">
-          <MDBCard style={{ marginRight: '5%',  height: '600px', width: '400px', marginTop: '5%', boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
-        padding: '5px 20px',}}>
-            <MDBCardBody>
-              <form onSubmit={this.handleSubmit}>
-                <p className="h4 text-center py-4">Schedule Appointment</p>
-                <div className="grey-text">
-                  <MDBInput
-                    label="Your name"
-                    icon="user"
-                    group
-                    type="text"
-                    validate
-                    error="wrong"
-                    success="right"
-                    value={this.state.name}
-                    onChange={this.handleChange}
-
-                  />
-                  <MDBInput
-                    label="Your School ID#"
-                    icon="edit"
-                    group
-                    type="text"
-                    validate
-                    error="wrong"
-                    success="right"
-                    value={this.state.id}
-                    onChange={this.handleChange}
-
-                  />
-                  <MDBInput
-                    label="State Query Summary"
-                    icon="exclamation-triangle"
-                    group
-                    type="text"
-                    validate
-                    error="wrong"
-                    success="right"
-                    value={this.state.query}
-                    onChange={this.handleChangeQuery}
-
-                  />
-        <MDBRow>
-        <MDBCol size="3">
-
-<MDBInput
-                    group
-                    type="text"
-                    validate
-                    error="wrong"
-                    success="right"
-                    value={this.state.year}
-                    onChange={this.handleChangeYear}
-
-                  />
-                  </MDBCol>
-                  <MDBCol size="1">
-                    <h3>-</h3>
-                  </MDBCol>
-                  <MDBCol size="3">
-
-<MDBInput
-                    group
-                    type="text"
-                    validate
-                    error="wrong"
-                    success="right"
-                    value={this.state.month}
-                    onChange={this.handleChangeMonth}
-
-                  />
-                  </MDBCol>
-                  <MDBCol size="1">
-                    <h3>-</h3>
-                  </MDBCol>
-                  <MDBCol size="3">
-
-<MDBInput
-                    group
-                    type="text"
-                    validate
-                    error="wrong"
-                    success="right"
-                    value={this.state.day}
-                    onChange={this.handleChangeDay}
-
-                  />
-                  </MDBCol>
-                  
-                  </MDBRow>
-
-
-
-      
-                </div>
-                <div className="text-center py-4 mt-3">
-                  <MDBBtn color="cyan" type="submit">
-                    Register
-                  </MDBBtn>
-                </div>
-              </form>
-            </MDBCardBody>
-          </MDBCard>
-        </MDBCol>
+<MDBCol size="2">
+  </MDBCol>
         </MDBRow>
       </div>
     );
+}
   }
 }

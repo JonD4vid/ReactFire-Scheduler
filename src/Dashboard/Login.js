@@ -20,22 +20,37 @@ export default class Login extends Component {
 
   constructor(props) {
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();   
     super(props);
 
     this.state = {
-        username: '',
+        email: '',
         password: '',
     }
-    // this.handleUsername = this.handleUsername.bind(this);
-    // this.handleChangeDate = this.handleChangeDate.bind(this);
 
-    // this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChangeEmail = this.handleChangeEmail.bind(this);
+    this.handleChangePassword = this.handleChangePassword.bind(this);
+
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  handleChangeEmail(event) {
+    this.setState({
+      email: event.target.value,
+    
+    });
+  }
+
+  handleChangePassword(event) {
+    this.setState({
+      password: event.target.value,
+    
+    });
+  }
+ 
+
   handleSubmit(){
-    const {username, password} = this.state;
-    firebase.auth().signInWithEmailAndPassword(username, password).catch(function(error) {
+    const {email, password} = this.state;
+    firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
       // Handle Errors here.
       var errorCode = error.code;
       var errorMessage = error.message;
@@ -52,36 +67,46 @@ export default class Login extends Component {
 
 
         <MDBCol md="4">
-          <MDBCard style={{ 
-            backgroundColor: '#fafafa',
-            height: '450px', width:'400px',
-            marginTop: '5%',
-            boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
-            padding: '5px 20px',
-       }}>
-          <form onSubmit={this.handleSubmit}>
-            <p className="h4 text-center mb-4">Sign in</p>
-            <label htmlFor="defaultFormLoginEmailEx" className="grey-text">
-              Your email
-            </label>
-            <input
-              type="email"
-              id="defaultFormLoginEmailEx"
-              className="form-control"
-            />
-            <br />
-            <label htmlFor="defaultFormLoginPasswordEx" className="grey-text">
-              Your password
-            </label>
-            <input
-              type="password"
-              id="defaultFormLoginPasswordEx"
-              className="form-control"
-            />
-            <div className="text-center mt-4">
-              <MDBBtn color="indigo" type="submit">Login</MDBBtn>
-            </div>
-          </form>
+        <MDBCard style={{ marginRight: '5%',  height: '600px', width: '400px', marginTop: '5%', boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
+        padding: '5px 20px',}}>
+            <MDBCardBody>
+              <form onSubmit={this.handleSubmit}>
+                <p className="h4 text-center py-4">Login</p>
+                <div className="grey-text">
+                  <MDBInput
+                    label="Username"
+                    icon="user"
+                    group
+                    type="text"
+                    validate
+                    error="wrong"
+                    success="right"
+                    value={this.state.email}
+                    onChange={this.handleChangeEmail}
+
+                  />
+                  <MDBInput
+                    label="Password"
+                    icon="edit"
+                    group
+                    type="text"
+                    validate
+                    error="wrong"
+                    success="right"
+                    value={this.state.password}
+                    onChange={this.handleChangePassword}
+
+                  />
+                  </div>
+                <div className="text-center py-4 mt-3">
+                  <MDBBtn color="cyan" type="submit">
+                    Login
+                  </MDBBtn>
+                </div>
+
+
+              </form>
+            </MDBCardBody>
           </MDBCard>
         </MDBCol>
         <MDBCol md="4">

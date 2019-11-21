@@ -142,10 +142,9 @@ export default class Main extends Component {
 
   }
 
-  handleSubmit() {
+  handleSubmit = () => {
     const { name, id, query, day, month, year} = this.state;
     const date = year + '-' + month + '-' + day;
-
 
 
     this.setState({
@@ -169,6 +168,15 @@ export default class Main extends Component {
     }
   
 
+    firebase.firestore().collection("schedule").add(data)
+    .then(function(docRef) {
+        console.log("Document written with ID: ", docRef.id);
+    })
+    .catch(function(error) {
+        console.error("Error adding document: ", error);
+    });
+
+    
     console.log(date)
     console.log(this.state.events)
     // console.log(this.state.name)
@@ -250,8 +258,14 @@ handleDateClick = arg => {
           </MDBCol>
           
           <MDBCol size="2">
-            <h3>Welcome: </h3>
-            </MDBCol>
+<MDBRow>
+
+  <h3 style= {{marginRight: 15}}>Welcome: User</h3>
+  <button type="button" class="btn btn-danger">Sign Out</button>
+
+  </MDBRow>
+
+  </MDBCol>
             </MDBRow>
           <MDBRow>
           
