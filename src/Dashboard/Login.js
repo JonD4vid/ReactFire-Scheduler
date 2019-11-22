@@ -50,11 +50,14 @@ export default class Login extends Component {
 
   handleSubmit(){
     const {email, password} = this.state;
+    let path = `/admin`;
     firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
       // Handle Errors here.
       var errorCode = error.code;
       var errorMessage = error.message;
       // ...
+
+      this.props.history.push(path);
     });
   }
 
