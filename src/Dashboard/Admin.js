@@ -6,27 +6,31 @@ import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
 import '@fullcalendar/core/main.css';
 // import '@fullcalendar/daygrid/main.css';
 import {MDBRow, MDBCol, MDBInput, MDBBtn, MDBCard, MDBCardBody } from 'mdbreact';
-import * as firebase from 'firebase';
+import { withRouter, Redirect} from 'react-router-dom';
+
+import { compose } from 'recompose';
+import { withFirebase } from '../Firebase/index';
+import  { FirebaseContext } from '../Firebase';
+import {Table} from 'react-bootstrap'
+import { Link } from 'react-router-dom';
+import SignOutButton from './SignOutButton';
+
+import '../Dashboard/Admin.css'
+
+const Admin = () => (
+  <div>
+    <FirebaseContext.Consumer>
+      {firebase => <Administrator firebase={firebase} />}
+    </FirebaseContext.Consumer>
+  </div>
+);
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBGq-3MeR6v02D6y6rxE4drXzJl7uzNrjs",
-  authDomain: "usc-scheduler.firebaseapp.com",
-  databaseURL: "https://usc-scheduler.firebaseio.com",
-  projectId: "usc-scheduler",
-  storageBucket: "usc-scheduler.appspot.com",
-  messagingSenderId: "273478421299",
-  appId: "1:273478421299:web:a44d26987c27f5930b4c46",
-  measurementId: "G-YETGSPR9DH"
-};
-
-export default class Admin extends Component {
+ class Administrator extends Component {
   calendarComponentRef = React.createRef();
 
   constructor(props) {
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();   
-    super(props);
+       super(props);
 
     this.state = {
       events: [],
@@ -45,23 +49,8 @@ export default class Admin extends Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
 
-    // firebase.auth().onAuthStateChanged(function(user) {
-    //   if (user) {
-    //     // User is signed in.
-    //     var displayName = user.displayName;
-    //     var email = user.email;
-    //     var emailVerified = user.emailVerified;
-    //     var photoURL = user.photoURL;
-    //     var isAnonymous = user.isAnonymous;
-    //     var uid = user.uid;
-    //     var providerData = user.providerData;
-    //     // ...
-    //   } else {
-    //     // User is signed out.
-    //     // ...
-    //   }
-    // });
   }
+
 
   handleChangeQuery(event) {
     this.setState({
@@ -80,7 +69,7 @@ export default class Admin extends Component {
 
   componentDidMount(){
     var array = [];
-    firebase.firestore().collection("schedule")
+    this.props.firebase.collection("schedule")
     .get()
     .then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
@@ -125,13 +114,13 @@ export default class Admin extends Component {
     // console.log(this.state.events)
     // // console.log(this.state.name)
 
-  //   firebase.firestore().collection("schedule").add(data)
-  // .then(function(docRef) {
-  //     console.log("Document written with ID: ", docRef.id);
-  // })
-  // .catch(function(error) {
-  //     console.error("Error adding document: ", error);
-  // });
+    this.props.firebase.firestore().collection("schedule").add(data)
+  .then(function(docRef) {
+      console.log("Document written with ID: ", docRef.id);
+  })
+  .catch(function(error) {
+      console.error("Error adding document: ", error);
+  });
 
 
 
@@ -163,6 +152,37 @@ handleDateClick = arg => {
   }
 };
 
+
+renderTableHeader() {
+
+     return(
+       <thead>
+         <tr>
+           <th>ID#</th>
+           <th>Name</th>
+           <th>Query</th>
+           <th>Appointment Date</th>
+         </tr>
+       </thead>
+     );
+}
+
+renderTableData() {
+  return this.state.events.map((student) => {
+     return (
+       
+        <tr>
+           <td>{student.id}</td>
+           <td>{student.title}</td>
+           <td>{student.query}</td>
+           <td>{student.start}</td>
+        </tr>
+     )
+  })
+}
+
+
+
     render() {
 
       if(this.state.isFetching){
@@ -175,8 +195,6 @@ handleDateClick = arg => {
       }
 
       if(this.state.isFetching == false ){
-
-
     return (
 <div>
 <MDBRow style={{marginTop: '1%'}}> 
@@ -187,8 +205,7 @@ handleDateClick = arg => {
 <MDBRow>
 
   <h3 style= {{marginRight: 15}}>Welcome: Admin</h3>
-  <button type="button" class="btn btn-danger">Sign Out</button>
-
+<SignOutButton />
   </MDBRow>
 
   </MDBCol>
@@ -203,7 +220,7 @@ handleDateClick = arg => {
        }}>
 
 <div>
-  <FullCalendar
+  {/* <FullCalendar
 
     header={{
     left: 'prev,next today',
@@ -215,7 +232,21 @@ handleDateClick = arg => {
     weekends={false}
     events={this.state.events}
     // dateClick={this.handleDateClick}
-    />
+    /> */}
+
+{this.state.events.length <= 0?  
+
+null
+  :
+<Table  striped bordered hover variant="dark">
+{this.renderTableHeader()}
+               <tbody>
+                  {this.renderTableData()}
+               </tbody>
+            </Table>
+
+}
+
     </div>
     </MDBCard>
 </MDBCol>
@@ -225,5 +256,9 @@ handleDateClick = arg => {
       </div>
     );
 }
-  }
+      }
+
+  
 }
+
+export default Admin;

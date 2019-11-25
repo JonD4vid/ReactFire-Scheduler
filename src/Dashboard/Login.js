@@ -1,67 +1,75 @@
 import React, { Component } from 'react';
 import { MDBContainer, MDBRow, MDBCol, MDBInput, MDBBtn, MDBCard, MDBCardBody } from 'mdbreact';
 import { MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter } from 'mdbreact';
-import * as firebase from 'firebase';
+import { withRouter, Redirect} from 'react-router-dom';
+
+import { compose } from 'recompose';
+import { withFirebase } from '../Firebase/index';
+
+import { FirebaseContext } from '../Firebase';
+import { Alert } from 'react-bootstrap';
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBGq-3MeR6v02D6y6rxE4drXzJl7uzNrjs",
-  authDomain: "usc-scheduler.firebaseapp.com",
-  databaseURL: "https://usc-scheduler.firebaseio.com",
-  projectId: "usc-scheduler",
-  storageBucket: "usc-scheduler.appspot.com",
-  messagingSenderId: "273478421299",
-  appId: "1:273478421299:web:a44d26987c27f5930b4c46",
-  measurementId: "G-YETGSPR9DH"
+
+const Login = () => (
+  <div>
+        <FirebaseContext.Consumer>
+        {firebase => <LoginForm firebase={firebase}/>}
+        </FirebaseContext.Consumer>
+  </div>
+);
+
+const INITIAL_STATE = {
+  email: '',
+  password: '',
+  error: null,
 };
 
-export default class Login extends Component {
+
+class LoginFormBase extends Component {
 
 
   constructor(props) {
-    firebase.initializeApp(firebaseConfig);
     super(props);
 
-    this.state = {
-        email: '',
-        password: '',
-    }
+    this.state = { ...INITIAL_STATE };
 
-    this.handleChangeEmail = this.handleChangeEmail.bind(this);
-    this.handleChangePassword = this.handleChangePassword.bind(this);
-
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChangeEmail(event) {
-    this.setState({
-      email: event.target.value,
-    
-    });
-  }
 
-  handleChangePassword(event) {
-    this.setState({
-      password: event.target.value,
-    
-    });
-  }
+
  
 
-  handleSubmit(){
-    const {email, password} = this.state;
-    let path = `/admin`;
-    firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // ...
+  handleSubmit = event =>{
+    const { email, password } = this.state;
+    this.props.firebase
+      .doSignInWithEmailAndPassword(email, password)
+      .then(() => {
+        this.setState({ ...INITIAL_STATE });
+        if(email == 'test@test.com'){
+          this.props.history.push('./home')
+        }
+        else if (email == 'test@admin.com'){
+        this.props.history.push('./admin');
+        }
+      })
+      .catch(error => {
+        this.setState({ error });
+        console.log(error);
+        Alert(error)
+      });
+      event.preventDefault();
 
-      this.props.history.push(path);
-    });
   }
 
+  onChange = event => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
     render() {
+      const { email, password, error } = this.state;
+      const isInvalid = password === '' || email === '';
+
     return (
       <MDBContainer>
       <MDBRow>
@@ -70,45 +78,54 @@ export default class Login extends Component {
 
 
         <MDBCol md="4">
-        <MDBCard style={{ marginRight: '5%',  height: '600px', width: '400px', marginTop: '5%', boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
+        <MDBCard style={{ marginRight: '5%',  height: '500px', width: '400px', marginTop: '50%', boxShadow: '0 0px 5px 0px rgba(0, 0, 0, 0.1)',
         padding: '5px 20px',}}>
             <MDBCardBody>
-              <form onSubmit={this.handleSubmit}>
-                <p className="h4 text-center py-4">Login</p>
+            <form onSubmit={this.handleSubmit}>
+                <p className="h4 text-center py-4">Sign In</p>
                 <div className="grey-text">
                   <MDBInput
-                    label="Username"
+                    label="Email"
+                    name="email"
                     icon="user"
                     group
                     type="text"
                     validate
                     error="wrong"
                     success="right"
-                    value={this.state.email}
-                    onChange={this.handleChangeEmail}
+                    value={email}
+                    onChange={this.onChange}
 
                   />
                   <MDBInput
                     label="Password"
+                    name="password"
                     icon="edit"
                     group
-                    type="text"
+                    type="password"
                     validate
                     error="wrong"
                     success="right"
-                    value={this.state.password}
-                    onChange={this.handleChangePassword}
+                    value={password}
+                    onChange={this.onChange}
 
                   />
                   </div>
                 <div className="text-center py-4 mt-3">
-                  <MDBBtn color="cyan" type="submit">
+                  <MDBBtn disabled={isInvalid} class="btn btn-positive"type="submit" color="cyan">
                     Login
                   </MDBBtn>
+                 
+
                 </div>
 
 
               </form>
+
+              <p>User email: test@test.com</p>
+              <p>Admin email: test@admin.com</p>
+              <p>Password: password</p>
+
             </MDBCardBody>
           </MDBCard>
         </MDBCol>
@@ -121,3 +138,11 @@ export default class Login extends Component {
     );
   }
 }
+
+
+const LoginForm = compose(
+  withRouter,
+  withFirebase,
+)(LoginFormBase);
+export default Login;
+export { LoginForm };

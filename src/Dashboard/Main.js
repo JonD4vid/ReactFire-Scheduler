@@ -6,26 +6,31 @@ import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
 import '@fullcalendar/core/main.css';
 // import '@fullcalendar/daygrid/main.css';
 import {MDBRow, MDBCol, MDBInput, MDBBtn, MDBCard, MDBCardBody } from 'mdbreact';
-import * as firebase from 'firebase';
+import  { FirebaseContext } from '../Firebase';
+import { withRouter, Redirect} from 'react-router-dom';
+
+import { Link } from 'react-router-dom';
+import SignOutButton from './SignOutButton';
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBGq-3MeR6v02D6y6rxE4drXzJl7uzNrjs",
-  authDomain: "usc-scheduler.firebaseapp.com",
-  databaseURL: "https://usc-scheduler.firebaseio.com",
-  projectId: "usc-scheduler",
-  storageBucket: "usc-scheduler.appspot.com",
-  messagingSenderId: "273478421299",
-  appId: "1:273478421299:web:a44d26987c27f5930b4c46",
-  measurementId: "G-YETGSPR9DH"
-};
 
-export default class Main extends Component {
+
+
+const Main = () => (
+  <div>
+    <FirebaseContext.Consumer>
+      {firebase => <Home firebase={firebase} />}
+    </FirebaseContext.Consumer>
+  </div>
+);
+
+
+
+
+class Home extends Component {
   calendarComponentRef = React.createRef();
 
   constructor(props) {
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();   
     super(props);
 
     this.state = {
@@ -49,22 +54,6 @@ export default class Main extends Component {
 
     // this.handleSubmit = this.handleSubmit.bind(this);
 
-    // firebase.auth().onAuthStateChanged(function(user) {
-    //   if (user) {
-    //     // User is signed in.
-    //     var displayName = user.displayName;
-    //     var email = user.email;
-    //     var emailVerified = user.emailVerified;
-    //     var photoURL = user.photoURL;
-    //     var isAnonymous = user.isAnonymous;
-    //     var uid = user.uid;
-    //     var providerData = user.providerData;
-    //     // ...
-    //   } else {
-    //     // User is signed out.
-    //     // ...
-    //   }
-    // });
   }
   
 
@@ -114,7 +103,7 @@ export default class Main extends Component {
 
   componentDidMount(){
     var array = [];
-    firebase.firestore().collection("schedule")
+    this.props.firebase.collection("schedule")
     .get()
     .then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
@@ -168,7 +157,7 @@ export default class Main extends Component {
     }
   
 
-    firebase.firestore().collection("schedule").add(data)
+    this.props.firebase.collection("schedule").add(data)
     .then(function(docRef) {
         console.log("Document written with ID: ", docRef.id);
     })
@@ -181,7 +170,7 @@ export default class Main extends Component {
     console.log(this.state.events)
     // console.log(this.state.name)
 
-    firebase.firestore().collection("schedule").add(data)
+    this.props.firebase.collection("schedule").add(data)
   .then(function(docRef) {
       console.log("Document written with ID: ", docRef.id);
   })
@@ -226,7 +215,7 @@ handleDateClick = arg => {
       start: arg.dateStr,
       allDay: arg.allDay
     }
-     firebase.firestore().collection("schedule").add(data)
+     this.props.firebase.collection("schedule").add(data)
    .then(function(docRef) {
        console.log("Document written with ID: ", docRef.id);
    })
@@ -261,8 +250,7 @@ handleDateClick = arg => {
 <MDBRow>
 
   <h3 style= {{marginRight: 15}}>Welcome: User</h3>
-  <button type="button" class="btn btn-danger">Sign Out</button>
-
+<SignOutButton />
   </MDBRow>
 
   </MDBCol>
@@ -412,7 +400,9 @@ handleDateClick = arg => {
                   </MDBRow>
                 </div>
               );
-      }
+          }
 
   }
 }
+
+export default Main;
