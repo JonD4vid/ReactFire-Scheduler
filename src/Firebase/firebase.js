@@ -17,7 +17,7 @@ const firebaseConfig = {
 
 
   class Firebase {
-    constructor() {
+    constructor(props) {
       app.initializeApp(firebaseConfig);
       this.auth = app.auth();
       this.db = app.firestore();
@@ -32,7 +32,7 @@ const firebaseConfig = {
  this.auth.signInWithEmailAndPassword(email, password);
 
  doSignOut = () => {
-   this.auth.signOut();
+   this.auth.signOut().then(() => this.props.history.push('./'))
   }
 
  collection = (name) => this.db.collection(name)

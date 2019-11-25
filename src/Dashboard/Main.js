@@ -10,9 +10,7 @@ import  { FirebaseContext } from '../Firebase';
 import { withRouter, Redirect} from 'react-router-dom';
 
 import { Link } from 'react-router-dom';
-import SignOutButton from './SignOutButton';
-
-
+// import SignOutButton from './SignOutButton';
 
 
 
@@ -250,8 +248,8 @@ handleDateClick = arg => {
 <MDBRow>
 
   <h3 style= {{marginRight: 15}}>Welcome: User</h3>
-<SignOutButton />
-  </MDBRow>
+  <Link to="./" onClick={this.doSignOut}>Sign out</Link>
+ </MDBRow>
 
   </MDBCol>
             </MDBRow>

@@ -205,7 +205,7 @@ renderTableData() {
 <MDBRow>
 
   <h3 style= {{marginRight: 15}}>Welcome: Admin</h3>
-<SignOutButton />
+  <Link to="./" onClick={this.doSignOut}>Sign out</Link>
   </MDBRow>
 
   </MDBCol>
